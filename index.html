@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kalkulatori i importit</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--ink:#16222c;--mute:#5d6c78;--line:#d8dfe4;--acc:#0b5d5a;--on:#fff;--soft:#e4f0ee;--in:#fff;--err:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171b;--card:#182228;--ink:#e6edf1;--mute:#93a4af;--line:#2b3a43;--acc:#4fc1b8;--on:#07201e;--soft:#1b3330;--in:#111a1f;--err:#f2b8b5}}
+:root[data-theme="dark"]{--bg:#10171b;--card:#182228;--ink:#e6edf1;--mute:#93a4af;--line:#2b3a43;--acc:#4fc1b8;--on:#07201e;--soft:#1b3330;--in:#111a1f;--err:#f2b8b5}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 12px}
+main,header{max-width:1400px;margin:0 auto;padding:0 16px}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding-top:18px;padding-bottom:14px}
+.mute,.hint{color:var(--mute);font-size:13px}.err{color:var(--err);font-size:13px}
+section,details,.auth section{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:14px}
+details summary{cursor:pointer;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.g .w2{grid-column:span 2}
+label{display:block;font-size:12.5px;color:var(--mute);margin:10px 0 3px}.g label{margin-top:0}
+input,select{font:inherit;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%;min-width:0}
+input[type=checkbox]{width:auto}.chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:13px;color:var(--mute)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.btn{font:inherit;font-weight:500;background:var(--acc);color:var(--on);border:1px solid var(--acc);border-radius:6px;padding:7px 14px;cursor:pointer;white-space:nowrap}
+.btn.alt{background:transparent;color:var(--acc)}.btn:disabled{opacity:.5;cursor:default}
+.row select,.row input{width:auto;min-width:200px}
+.auth{max-width:420px;margin:56px auto;padding:0 16px}.auth h1{margin-bottom:4px}
+.top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:14px;align-items:start}@media (max-width:980px){.top{grid-template-columns:1fr}}
+.led{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.led th{font-weight:400;text-align:left;color:var(--ink);padding:5px 0;border:0}
+.led td{text-align:right;padding:5px 0 5px 10px;border:0}.led td.p{color:var(--mute);font-size:12.5px;width:64px}
+.led tr.sub td,.led tr.sub th{border-top:1px solid var(--line);font-weight:600}.led tr.big td,.led tr.big th{border-top:2px solid var(--acc);font-weight:700;color:var(--acc);font-size:16px;padding-top:8px}
+.led thead th{font-size:12px;color:var(--mute);text-align:right;border-bottom:1px solid var(--line)}.led thead th:first-child{text-align:left}
+.wrap{overflow-x:auto}table.lines{border-collapse:collapse;width:100%;min-width:1700px}
+.lines th{font-size:12px;font-weight:500;color:var(--mute);text-align:left;padding:6px 4px;border-bottom:2px solid var(--line);vertical-align:bottom}
+.lines td{padding:4px;border-bottom:1px solid var(--line)}.lines td.n,.lines th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;padding-right:8px}
+.lines td.k{font-weight:600}.lines tfoot td{font-weight:600;border:0;border-top:2px solid var(--line);padding-top:8px}
+input.c{width:74px}input.d{min-width:200px}input.u{width:64px}input.q{width:76px}input.p{width:88px}input.k{width:62px}input.r{width:70px}input.e{width:76px}.lines select.v{width:70px}
+.x{background:none;border:0;color:var(--mute);font-size:19px;cursor:pointer;padding:0 8px}.x:hover{color:var(--err)}
+.chip{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px}.chip button{background:none;border:0;color:var(--mute);cursor:pointer}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}.lang button{font:inherit;font-size:12.5px;background:transparent;color:var(--mute);border:0;padding:5px 10px;cursor:pointer}.lang button[aria-pressed=true]{background:var(--acc);color:var(--on)}
+.notes{font-size:13px;color:var(--mute)}.notes p{margin:0 0 6px}
+</style>
+</head>
+<body>
+<div class="auth" id="auth"><section>
+<div style="float:right"><div class="lang" role="group" aria-label="Language"><button type="button" data-l="sq" aria-pressed="true">SQ</button><button type="button" data-l="en" aria-pressed="false">EN</button></div></div>
+<h1>Kalkulatori i importit</h1>
+<p class="mute">Hyr për të punuar me kompanitë e tua.</p>
+<label for="aE">Email</label><input id="aE" type="email" autocomplete="username">
+<label for="aP">Fjalëkalimi (të paktën 6 shkronja)</label><input id="aP" type="password" autocomplete="current-password">
+<div class="row"><button class="btn" id="aIn" type="button">Hyr</button><button class="btn alt" id="aUp" type="button">Regjistrohu</button><button class="btn alt" id="aDemo" type="button" hidden>Shiko demon (pa hyrje)</button></div>
+<p class="mute" id="aMsg" role="status"></p>
+</section></div>
+
+<div id="app" hidden>
+<header>
+<div><h1>Kalkulatori i importit</h1><span class="mute">Kosovë · doganë, akcizë dhe TVSH</span></div>
+<div class="row" style="margin:0"><select id="co" aria-label="Kompania"></select><span class="mute" id="who"></span><div class="lang" role="group" aria-label="Language"><button type="button" data-l="sq" aria-pressed="true">SQ</button><button type="button" data-l="en" aria-pressed="false">EN</button></div><button class="btn alt" id="out" type="button">Dil</button></div>
+</header>
+<main>
+<details><summary>Menaxho kompaninë dhe kolegët</summary>
+<div class="row">
+<button class="btn alt" id="coAdd" type="button">Shto kompani</button><button class="btn alt" id="coRen" type="button">Riemërto</button><button class="btn alt" id="coDel" type="button">Fshi kompaninë</button>
+<button class="btn alt" id="bk" type="button">Eksporto kopje (.json)</button><button class="btn alt" id="flb" type="button">Importo kopje</button><input type="file" id="fl" accept=".json" hidden>
+</div>
+<label>Kolegët me qasje</label><div class="row" id="mem" style="margin-top:0"></div>
+<div class="row" id="memAdd"><input id="mEmail" type="email" placeholder="email i kolegut" aria-label="Email i kolegut"><button class="btn alt" id="mBtn" type="button">Shto kolegun</button></div>
+<p class="hint">Kolegu duhet të regjistrohet më parë me atë email. Vetëm pronari e menaxhon kompaninë.</p>
+</details>
+
+<section>
+<h2>Llogaritjet e ruajtura</h2>
+<div class="row" style="margin-top:0"><select id="pj" aria-label="Llogaritjet e ruajtura"></select>
+<button class="btn" id="pjSave" type="button">Ruaj si…</button><button class="btn alt" id="pjDel" type="button">Fshi</button><button class="btn alt" id="pjNew" type="button">E re</button></div>
+<p class="hint">Zgjedhja e një llogaritjeje e hap menjëherë. Ruajtja e emrit ekzistues e zëvendëson atë.</p>
+</section>
+
+<div class="top">
+<div>
+<section>
+<h2>Furnitori dhe dokumenti</h2>
+<div class="g">
+<div class="w2"><label for="sup">Furnitori</label><input id="sup"></div>
+<div><label for="nInv">Nr. i faturës së furnitorit</label><input id="nInv"></div>
+<div><label for="dInv">Data e faturës</label><input id="dInv" type="date"></div>
+<div><label for="dDoc">Data e dokumentit</label><input id="dDoc" type="date"></div>
+<div><label for="ref">Referenca</label><input id="ref"></div>
+<div><label for="dud">DUD (deklarata doganore)</label><input id="dud"></div>
+<div><label for="dDud">Data e DUD-it</label><input id="dDud" type="date"></div>
+<div><label for="cur">Valuta</label><input id="cur" maxlength="5"></div>
+<div><label for="kurs">Kursi (1 njësi e valutës = ? EUR)</label><input id="kurs" type="number" step="0.00000001" min="0"></div>
+<div class="w2"><label for="note">Vërejtja</label><input id="note"></div>
+</div>
+</section>
+<section>
+<h2>Kostot e dokumentit</h2>
+<div class="g">
+<div><label for="tr">Transporti (EUR)</label><input id="tr" type="number" step="0.01" min="0"></div>
+<div><label for="add">Shtesa doganore: sigurim, komision, paketim (EUR)</label><input id="add" type="number" step="0.01" min="0"></div>
+<div><label for="aft">Shpenzime pas doganës, pa TVSH (EUR)</label><input id="aft" type="number" step="0.01" min="0"></div>
+</div>
+<label class="chk"><input type="checkbox" id="vatpost">Shpenzimet pas doganës hyjnë edhe në bazën e TVSH-së</label>
+</section>
+</div>
+
+<section>
+<h2 id="sumT">Përmbledhja e detajuar</h2>
+<table class="led">
+<thead><tr><th></th><th>Shuma (EUR)</th><th>% e vlerës furnizuese</th></tr></thead>
+<tbody>
+<tr><th>Vlera e faturës (para rabatit)</th><td data-k="gross0"></td><td class="p"></td></tr>
+<tr><th>Rabati</th><td data-k="ndisc"></td><td class="p"></td></tr>
+<tr class="sub"><th>Vlera furnizuese (neto)</th><td data-k="net0"></td><td class="p"></td></tr>
+<tr><th>Transporti</th><td data-k="ship"></td><td class="p" data-p="ship"></td></tr>
+<tr><th>Shtesa doganore</th><td data-k="add"></td><td class="p" data-p="add"></td></tr>
+<tr class="sub"><th>Baza për doganë</th><td data-k="base"></td><td class="p"></td></tr>
+<tr><th>Dogana</th><td data-k="dut"></td><td class="p" data-p="dut"></td></tr>
+<tr><th>Akciza</th><td data-k="exc"></td><td class="p" data-p="exc"></td></tr>
+<tr><th>Shpenzimet pas doganës</th><td data-k="post"></td><td class="p" data-p="post"></td></tr>
+<tr class="big"><th>Vlera kushtuese (pa TVSH)</th><td data-k="cost"></td><td class="p"></td></tr>
+<tr><th>TVSH</th><td data-k="vat"></td><td class="p"></td></tr>
+<tr class="sub"><th>Vlera me TVSH</th><td data-k="gross"></td><td class="p"></td></tr>
+</tbody>
+</table>
+</section>
+</div>
+
+<section>
+<h2>Detalet</h2>
+<div class="wrap"><table class="lines">
+<thead><tr><th>Shifra</th><th>Emërtimi</th><th>Njësia</th><th>Sasia</th><th>Çmimi furnizues</th><th>Rabati %</th><th>Origjina</th><th>Dogana %</th><th>Akciza (EUR)</th><th>Tarifa</th>
+<th class="n">Vlera furnizuese</th><th class="n">Transporti</th><th class="n">Shtesa doganore</th><th class="n">Baza për doganë</th><th class="n">Dogana</th><th class="n">TVSH</th><th class="n">Çmimi kushtues</th><th class="n">Vlera kushtuese</th><th class="n">Vlera me TVSH</th><th></th></tr></thead>
+<tbody id="rows"></tbody>
+<tfoot><tr><td colspan="10">Totali (EUR)</td><td class="n" data-k="net0"></td><td class="n" data-k="ship"></td><td class="n" data-k="add"></td><td class="n" data-k="base"></td><td class="n" data-k="dut"></td><td class="n" data-k="vat"></td><td></td><td class="n" data-k="cost"></td><td class="n" data-k="gross"></td><td></td></tr></tfoot>
+</table></div>
+<div class="row"><button class="btn" id="add1" type="button">Shto mall</button><button class="btn alt" id="xl" type="button">Eksporto në Excel</button></div>
+</section>
+<p class="hint" id="st" role="status"></p>
+
+<section class="notes">
+<p>Vlera furnizuese = sasia × çmimi − rabati. Transporti dhe shtesa doganore ndahen mes artikujve sipas vlerës furnizuese. Baza për doganë = vlera furnizuese + transporti + shtesa doganore.</p>
+<p>Dogana = baza për doganë × norma (10% në përgjithësi; zakonisht 0% për mallra industriale me origjinë BE, CEFTA, Turqi ose EFTA, me dokument origjine). Vlera kushtuese = baza për doganë + dogana + akciza + shpenzimet pas doganës. TVSH = (baza për doganë + dogana + akciza) × tarifa.</p>
+<p>Vlerësim informues: norma e saktë varet nga kodi HS dhe llogaritja përfundimtare bëhet nga Dogana e Kosovës.</p>
+</section>
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script>
+"use strict";
+/* ---- Gjuha: shqip (parazgjedhja) dhe anglisht ---- */
+let LANG=(()=>{try{return JSON.parse(localStorage.getItem("kalk_lang"))||"sq";}catch(e){return"sq";}})();
+const EN={
+"Kalkulatori i importit":"Import calculator","Hyr për të punuar me kompanitë e tua.":"Sign in to work with your companies.","Fjalëkalimi (të paktën 6 shkronja)":"Password (at least 6 characters)",
+"Hyr":"Sign in","Regjistrohu":"Sign up","Shiko demon (pa hyrje)":"View demo (no sign-in)","Kosovë · doganë, akcizë dhe TVSH":"Kosovo · customs duty, excise and VAT","Dil":"Sign out",
+"Menaxho kompaninë dhe kolegët":"Manage company and colleagues","Shto kompani":"Add company","Riemërto":"Rename","Fshi kompaninë":"Delete company",
+"Eksporto kopje (.json)":"Export backup (.json)","Importo kopje":"Import backup","Kolegët me qasje":"Colleagues with access","email i kolegut":"colleague’s email","Email i kolegut":"Colleague’s email","Shto kolegun":"Add colleague",
+"Kolegu duhet të regjistrohet më parë me atë email. Vetëm pronari e menaxhon kompaninë.":"The colleague must first sign up with that email. Only the owner manages the company.",
+"Llogaritjet e ruajtura":"Saved calculations","Ruaj si…":"Save as…","Fshi":"Delete","E re":"New",
+"Zgjedhja e një llogaritjeje e hap menjëherë. Ruajtja e emrit ekzistues e zëvendëson atë.":"Selecting a calculation opens it immediately. Saving under an existing name replaces it.",
+"Furnitori dhe dokumenti":"Supplier and document","Furnitori":"Supplier","Nr. i faturës së furnitorit":"Supplier invoice no.","Data e faturës":"Invoice date","Data e dokumentit":"Document date","Referenca":"Reference",
+"DUD (deklarata doganore)":"Customs declaration (DUD)","Data e DUD-it":"DUD date","Valuta":"Currency","Kursi (1 njësi e valutës = ? EUR)":"Exchange rate (1 unit of currency = ? EUR)","Vërejtja":"Remark",
+"Kostot e dokumentit":"Document costs","Transporti (EUR)":"Transport (EUR)","Shtesa doganore: sigurim, komision, paketim (EUR)":"Customs additions: insurance, commission, packaging (EUR)",
+"Shpenzime pas doganës, pa TVSH (EUR)":"Post-customs expenses, excl. VAT (EUR)","Shpenzimet pas doganës hyjnë edhe në bazën e TVSH-së":"Post-customs expenses are also included in the VAT base",
+"Përmbledhja e detajuar":"Detailed summary","Shuma (EUR)":"Amount (EUR)","% e vlerës furnizuese":"% of supplier value","Vlera e faturës (para rabatit)":"Invoice value (before discount)","Rabati":"Discount",
+"Vlera furnizuese (neto)":"Supplier value (net)","Transporti":"Transport","Shtesa doganore":"Customs additions","Baza për doganë":"Customs base","Dogana":"Customs duty","Akciza":"Excise",
+"Shpenzimet pas doganës":"Post-customs expenses","Vlera kushtuese (pa TVSH)":"Cost value (excl. VAT)","TVSH":"VAT","Vlera me TVSH":"Value incl. VAT",
+"Detalet":"Details","Shifra":"Code","Emërtimi":"Name","Njësia":"Unit","Sasia":"Quantity","Çmimi furnizues":"Supplier price","Rabati %":"Discount %","Origjina":"Origin","Dogana %":"Duty %","Akciza (EUR)":"Excise (EUR)","Tarifa":"VAT rate",
+"Vlera furnizuese":"Supplier value","Çmimi kushtues":"Unit cost","Vlera kushtuese":"Cost value","Totali (EUR)":"Total (EUR)","Shto mall":"Add item","Eksporto në Excel":"Export to Excel",
+"Vlera furnizuese = sasia × çmimi − rabati. Transporti dhe shtesa doganore ndahen mes artikujve sipas vlerës furnizuese. Baza për doganë = vlera furnizuese + transporti + shtesa doganore.":"Supplier value = quantity × price − discount. Transport and customs additions are split between items by supplier value. Customs base = supplier value + transport + customs additions.",
+"Dogana = baza për doganë × norma (10% në përgjithësi; zakonisht 0% për mallra industriale me origjinë BE, CEFTA, Turqi ose EFTA, me dokument origjine). Vlera kushtuese = baza për doganë + dogana + akciza + shpenzimet pas doganës. TVSH = (baza për doganë + dogana + akciza) × tarifa.":"Customs duty = customs base × rate (10% in general; usually 0% for industrial goods of EU, CEFTA, Turkish or EFTA origin, with proof of origin). Cost value = customs base + duty + excise + post-customs expenses. VAT = (customs base + duty + excise) × VAT rate.",
+"Vlerësim informues: norma e saktë varet nga kodi HS dhe llogaritja përfundimtare bëhet nga Dogana e Kosovës.":"Indicative estimate: the exact rate depends on the HS code and the final calculation is made by Kosovo Customs.",
+"Përshkrimi i mallit":"Item name","copë":"pcs","Norma doganore %":"Duty rate %","Fshi mallin":"Delete item","Hiq kolegun":"Remove colleague","Kompania":"Company","Sasia ":"Quantity",
+"Tjetër (Kinë, SHBA, etj.)":"Other (China, USA, etc.)","BE (MSA/SAA)":"EU (SAA)","Turqia":"Turkey","– nuk ke asnjë kompani –":"– no company yet –","– zgjidh një llogaritje –":"– select a calculation –",
+"Ndodhi një gabim.":"Something went wrong.","Demo: ky veprim kërkon lidhjen me Supabase.":"Demo: this action needs the Supabase connection.",
+"Mënyra demo: llogaritja funksionon, por ruajtja në cloud kërkon lidhjen me Supabase.":"Demo mode: the calculation works, but cloud saving needs the Supabase connection.",
+"Programi nuk është lidhur ende me Supabase. Plotëso skedarin config.js.":"The app is not connected to Supabase yet. Fill in the config.js file.",
+"Konfirmo emailin para se të hysh.":"Confirm your email before signing in.","Email ose fjalëkalim i gabuar.":"Wrong email or password.","Fjalëkalimi duhet të ketë të paktën 6 shkronja.":"The password must have at least 6 characters.",
+"Ky email është i regjistruar. Shtyp “Hyr”.":"This email is already registered. Press “Sign in”.","U regjistrove. Kontrollo emailin për ta konfirmuar llogarinë, pastaj shtyp “Hyr”.":"You are signed up. Check your email to confirm the account, then press “Sign in”.",
+"Nuk ke asnjë kompani. Shto një, ose kërkoji kolegut të të shtojë me emailin tënd.":"You have no company. Add one, or ask a colleague to add you by your email.",
+"Emri i kompanisë së re:":"New company name:","Emri i ri i kompanisë:":"New company name:","Vetëm pronari mund ta riemërtojë kompaninë.":"Only the owner can rename the company.","Vetëm pronari mund ta fshijë kompaninë.":"Only the owner can delete the company.",
+"Kompania u fshi.":"Company deleted.","Zgjidh ose shto një kompani së pari.":"Select or add a company first.","Emri i llogaritjes (p.sh. Dërgesa nga Gjermania):":"Calculation name (e.g. Shipment from Germany):",
+"Ekziston një llogaritje me këtë emër. Ta zëvendësoj?":"A calculation with this name exists. Replace it?","Të fillohet një llogaritje e re? Ajo në ekran do të pastrohet (ato të ruajtura mbeten).":"Start a new calculation? The one on screen will be cleared (saved ones remain).",
+"Llogaritje e re.":"New calculation.","Skedari nuk është i vlefshëm.":"The file is not valid.","Skedari nuk ka llogaritje.":"The file has no calculations.",
+"Vetëm pronari mund të shtojë kolegë":"Only the owner can add colleagues","Ky email nuk është regjistruar ende në program":"This email is not registered in the app yet","Duhet të hysh në llogari":"You must sign in",
+"Kalkulatori i importit – Kosovë":"Import calculator – Kosovo","Kursi (në EUR)":"Exchange rate (to EUR)","TVSH %":"VAT %","TOTALI":"TOTAL","Vlera e faturës":"Invoice value"
+};
+const PAT=[
+[/^Përmbledhja e detajuar – (.*)$/,"Detailed summary – $1"],[/^(.*) \(pronar\)$/,"$1 (owner)"],
+[/^U shtua kompania “(.*)”\.$/,"Company “$1” added."],[/^U shtua (.+)\.$/,"Added $1."],[/^U hap “(.*)”\.$/,"Opened “$1”."],
+[/^U ruajt në cloud: “(.*)”\.$/,"Saved to the cloud: “$1”."],[/^U fshi “(.*)”\.$/,"Deleted “$1”."],[/^U importuan (\d+) llogaritje\.$/,"$1 calculations imported."],
+[/^Të fshihet kompania “(.*)” me të gjitha llogaritjet e saj, për të gjithë kolegët\? Kjo nuk kthehet pas\.$/,"Delete company “$1” with all its calculations, for all colleagues? This cannot be undone."],
+[/^Të hiqet (.+) nga kjo kompani\?$/,"Remove $1 from this company?"],[/^Të fshihet llogaritja “(.*)” për të gjithë kolegët\?$/,"Delete calculation “$1” for all colleagues?"],
+[/^Të importohen (\d+) llogaritje në “(.*)”\? Emrat ekzistues do të zëvendësohen\.$/,"Import $1 calculations into “$2”? Existing names will be replaced."]];
+function tr_(s){
+  if(LANG!=="en"||typeof s!=="string")return s;
+  const k=s.trim();if(!k)return s;
+  if(EN[k]!==undefined)return s.replace(k,()=>EN[k]);
+  for(const [re,out] of PAT)if(re.test(k)){const r=k.replace(re,out);return s.replace(k,()=>r);}
+  return s;
+}
+const on=new WeakMap(),oa=new WeakMap();
+function tNode(n){const o=on.has(n)?on.get(n):n.nodeValue,t=LANG==="en"?tr_(o):o;if(t!==n.nodeValue){if(!on.has(n))on.set(n,n.nodeValue);n.nodeValue=t;}}
+function tEl(e){["placeholder","aria-label","title"].forEach(a=>{
+  if(!e.hasAttribute(a))return;let m=oa.get(e);if(!m)oa.set(e,m={});
+  const o=a in m?m[a]:e.getAttribute(a),t=LANG==="en"?tr_(o):o;if(t!==e.getAttribute(a)){m[a]=o;e.setAttribute(a,t);}});}
+function walk(root){
+  if(root.nodeType===3)return tNode(root);
+  if(root.nodeType!==1)return;
+  tEl(root);const w=document.createTreeWalker(root,NodeFilter.SHOW_ALL);
+  for(let n=w.nextNode();n;n=w.nextNode()){if(n.nodeType===3){if(!/^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName))tNode(n);}else tEl(n);}
+}
+new MutationObserver(ms=>{if(LANG==="en")ms.forEach(m=>m.addedNodes.forEach(walk));}).observe(document.body,{childList:true,subtree:true});
+function applyLang(){
+  document.documentElement.lang=LANG;walk(document.body);setTitle();
+  document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===LANG));
+  calc();
+}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem("kalk_lang",JSON.stringify(LANG));}catch(e){}applyLang();});
+
+/* ---- Konfigurimi ---- */
+const ORIGINS=[["Tjetër (Kinë, SHBA, etj.)",10],["BE (MSA/SAA)",0],["CEFTA",0],["Turqia",0],["EFTA",0]];
+const TARIFFS=[18,8,0];
+const FIELDS=["c","d","u","q","p","k","o","r","e","v"];
+const GLOBALS=["sup","nInv","dInv","dDoc","dud","dDud","ref","cur","kurs","note","tr","add","aft"];
+const blank=()=>({g:{sup:"",nInv:"",dInv:"",dDoc:new Date().toISOString().slice(0,10),dud:"",dDud:"",ref:"",cur:"EUR",kurs:1,note:"",tr:0,add:0,aft:0,vatpost:false},rows:[]});
+const DEMO={g:{sup:"GRASS GMBH OESTERREICH",nInv:"4565074",dInv:"2026-07-01",dDoc:"2026-07-08",dud:"262011R24847",dDud:"2026-07-08",ref:"262011R24847",cur:"EUR",kurs:1,note:"",tr:120,add:15,aft:30,vatpost:false},
+rows:[{c:"000485",d:"TIOMOS COVER CAP",u:"copë",q:5000,p:0.05,k:0,o:"0",r:"",e:0,v:18},{c:"000486",d:"TIOMOS HINGE COVER",u:"copë",q:2000,p:0.14,k:5,o:"0",r:"",e:0,v:18},{c:"000489",d:"TIOMOS HINGE TS CLIP",u:"copë",q:1500,p:1.62,k:0,o:"1",r:"",e:0,v:18}]};
+
+const $=id=>document.getElementById(id);
+const num=v=>{const n=parseFloat(v);return isFinite(n)&&n>0?n:0;};
+const fmt=(n,d=2)=>(isFinite(n)?n:0).toLocaleString(LANG==="en"?"en-US":"de-DE",{minimumFractionDigits:d,maximumFractionDigits:d});
+const say=(m,bad)=>{const e=$("st");e.textContent=m;e.className=bad?"err":"hint";};
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const ok=r=>{if(r.error)throw r.error;return r.data;};
+const busy=(btn,fn)=>async()=>{btn.disabled=true;try{await fn();}catch(e){say((e&&e.message)||"Ndodhi një gabim.",true);}finally{btn.disabled=false;}};
+const cloud=()=>{if(!sb)throw new Error("Demo: ky veprim kërkon lidhjen me Supabase.");return sb;};
+const ask=(m,d)=>prompt(tr_(m),d),sure=m=>confirm(tr_(m));
+const setTitle=()=>{document.title=tr_("Kalkulatori i importit")+(cur?" – "+curName():"");};
+let sb,me=null,cur="",comps=[],projs=[],mem=[],last=null;
+const tb=$("rows");
+const curName=()=>(comps.find(c=>c.id===cur)||{}).name||"";
+const slug=()=>curName().replace(/[\\\/:*?"<>|\s]+/g,"-")||"kompania";
+const isOwner=()=>mem.some(m=>m.user_id===me.id&&m.role==="owner");
+
+/* ---- Detalet dhe llogaritja ---- */
+function addRow(d={}){
+  const tr=document.createElement("tr");
+  const inp=(c,l,t="text",x="")=>`<td><input class="${c}" type="${t}" ${t==="number"?'min="0" step="any"':""} aria-label="${l}" ${x}></td>`;
+  tr.innerHTML=inp("c","Shifra")+inp("d","Emërtimi","text",'placeholder="Përshkrimi i mallit"')+inp("u","Njësia","text",'placeholder="copë"')+inp("q","Sasia","number")+inp("p","Çmimi furnizues","number")+inp("k","Rabati %","number",'placeholder="0"')+
+`<td><select class="o" aria-label="Origjina">${ORIGINS.map((o,i)=>`<option value="${i}">${o[0]}</option>`).join("")}</select></td>`+inp("r","Norma doganore %","number",'placeholder="auto"')+inp("e","Akciza","number",'value="0"')+
+`<td><select class="v" aria-label="Tarifa">${TARIFFS.map(v=>`<option value="${v}">T${v}</option>`).join("")}</select></td>`+
+["sv","tr","ad","bd","dut","vat","uc","cv","gr"].map(c=>`<td class="n${c==="uc"||c==="cv"?" k":""}" data-o="${c}"></td>`).join("")+
+`<td><button class="x" type="button" aria-label="Fshi mallin">×</button></td>`;
+  FIELDS.forEach(k=>{if(d[k]!==undefined&&d[k]!=="")tr.querySelector("."+k).value=d[k];});
+  tr.querySelector(".x").onclick=()=>{tr.remove();calc();};
+  tb.appendChild(tr);
+}
+function getState(){
+  const g=Object.fromEntries(GLOBALS.map(k=>[k,$(k).value]));g.vatpost=$("vatpost").checked;
+  return{g,rows:[...tb.children].map(tr=>Object.fromEntries(FIELDS.map(k=>[k,tr.querySelector("."+k).value])))};
+}
+function setState(s){
+  const g=Object.assign(blank().g,s.g||{});
+  if(s.g&&s.g.add===undefined&&(s.g.ins!==undefined||s.g.oth!==undefined))g.add=num(s.g.ins)+num(s.g.oth);
+  GLOBALS.forEach(k=>$(k).value=g[k]);$("vatpost").checked=!!g.vatpost;
+  tb.innerHTML="";(s.rows||[]).forEach(addRow);
+  if(!tb.children.length)addRow();
+  calc();
+}
+function calc(){
+  const kurs=num($("kurs").value)||1,tr=num($("tr").value),add=num($("add").value),aft=num($("aft").value),vatpost=$("vatpost").checked;
+  const rows=[...tb.children].map(el=>{const v=k=>el.querySelector("."+k).value,q=num(v("q")),p=num(v("p")),dp=Math.min(num(v("k")),100);
+    const gross0=q*p*kurs,disc=gross0*dp/100;return{el,v,q,p,gross0,disc,net0:gross0-disc};});
+  const sum=rows.reduce((a,r)=>a+r.net0,0);
+  const T={gross0:0,ndisc:0,net0:0,ship:0,add:0,base:0,dut:0,exc:0,post:0,cost:0,vat:0,gross:0};last={rows:[],T};
+  rows.forEach(r=>{
+    const sh=sum?r.net0/sum:0,ship=sh*tr,ad=sh*add,post=sh*aft,base=r.net0+ship+ad;
+    const o=ORIGINS[+r.v("o")]||ORIGINS[0];r.el.querySelector(".r").placeholder=o[1];
+    const rate=(r.v("r")!==""?num(r.v("r")):o[1])/100,dut=base*rate,exc=num(r.v("e")),vp=+r.v("v")||0;
+    const vat=(base+dut+exc+(vatpost?post:0))*vp/100,cost=base+dut+exc+post,gross=cost+vat,uc=r.q?cost/r.q:null;
+    const out={sv:r.net0,tr:ship,ad,bd:base,dut,vat,uc,cv:cost,gr:gross};
+    for(const k in out)r.el.querySelector(`[data-o=${k}]`).textContent=out[k]===null?"–":fmt(out[k],k==="uc"?4:2);
+    Object.entries({gross0:r.gross0,ndisc:-r.disc,net0:r.net0,ship,add:ad,base,dut,exc,post,cost,vat,gross}).forEach(([k,v])=>T[k]+=v);
+    last.rows.push([r.v("c"),r.v("d"),r.v("u"),r.q,r.p,Math.min(num(r.v("k")),100),o[0],rate*100,exc,"T"+vp,r.net0,ship,ad,base,dut,vat,uc||0,cost,gross]);
+  });
+  document.querySelectorAll("[data-k]").forEach(e=>e.textContent=fmt(T[e.dataset.k]));
+  document.querySelectorAll("[data-p]").forEach(e=>e.textContent=T.net0?fmt(T[e.dataset.p]/T.net0*100)+"%":"–");
+  if(me&&cur)ls.set("kalk_draft:"+me.id+":"+cur,getState());
+}
+document.addEventListener("input",calc);document.addEventListener("change",e=>{if(e.target.id==="vatpost")calc();});
+$("add1").onclick=()=>{addRow();calc();};
+
+/* ---- Eksporti në Excel ---- */
+$("xl").onclick=()=>{
+  calc();const T=last.T,v=id=>$(id).value;
+  const a=[["Kalkulatori i importit – Kosovë"],["Kompania",curName()],["Furnitori",v("sup")],["Nr. i faturës së furnitorit",v("nInv")],["Data e faturës",v("dInv")],["Data e dokumentit",v("dDoc")],["Referenca",v("ref")],["DUD (deklarata doganore)",v("dud")],["Data e DUD-it",v("dDud")],["Valuta",v("cur")],["Kursi (në EUR)",num(v("kurs"))||1],["Vërejtja",v("note")],[],
+   ["Përmbledhja e detajuar","Shuma (EUR)"],["Vlera e faturës (para rabatit)",T.gross0],["Rabati",T.ndisc],["Vlera furnizuese (neto)",T.net0],["Transporti",T.ship],["Shtesa doganore",T.add],["Baza për doganë",T.base],["Dogana",T.dut],["Akciza",T.exc],["Shpenzimet pas doganës",T.post],["Vlera kushtuese (pa TVSH)",T.cost],["TVSH",T.vat],["Vlera me TVSH",T.gross],[]];
+  const H=a.length;
+  a.push(["Shifra","Emërtimi","Njësia","Sasia","Çmimi furnizues","Rabati %","Origjina","Dogana %","Akciza (EUR)","Tarifa","Vlera furnizuese","Transporti","Shtesa doganore","Baza për doganë","Dogana","TVSH","Çmimi kushtues","Vlera kushtuese","Vlera me TVSH"],...last.rows,
+   ["TOTALI","","","","","","","","","",T.net0,T.ship,T.add,T.base,T.dut,T.vat,"",T.cost,T.gross]);
+  a.forEach((r,i)=>a[i]=r.map(c=>typeof c==="string"?tr_(c):c));
+  if(window.XLSX){
+    const ws=XLSX.utils.aoa_to_sheet(a);
+    Object.keys(ws).forEach(c=>{
+      if(c[0]==="!"||ws[c].t!=="n")return;
+      const p=XLSX.utils.decode_cell(c);
+      if(p.r>H&&p.c===3)return;
+      ws[c].z=p.r>H&&p.c===16?"#,##0.0000":(p.r===10&&p.c===1?"0.00000000":"#,##0.00");
+    });
+    ws["!cols"]=[30,34,9,9,14,10,26,10,12,8,16,13,15,16,12,12,15,16,15].map(wch=>({wch}));
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Kalkulimi");
+    XLSX.writeFile(wb,"kalkulimi-"+slug()+".xlsx");
+  }else{
+    const csv="\ufeff"+a.map(r=>r.map(c=>{const t=String(c??"");return/[",\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;}).join(",")).join("\r\n");
+    download("kalkulimi-"+slug()+".csv",new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  }
+};
+function download(name,blob){const l=document.createElement("a");l.href=URL.createObjectURL(blob);l.download=name;document.body.appendChild(l);l.click();l.remove();}
+
+/* ---- Hyrja ---- */
+const amsg=t=>$("aMsg").textContent=t;
+async function login(){
+  const r=await sb.auth.signInWithPassword({email:$("aE").value.trim(),password:$("aP").value});
+  if(r.error)return amsg(/confirm/i.test(r.error.message)?"Konfirmo emailin para se të hysh.":"Email ose fjalëkalim i gabuar.");
+  enter(r.data.user);
+}
+async function signup(){
+  if($("aP").value.length<6)return amsg("Fjalëkalimi duhet të ketë të paktën 6 shkronja.");
+  const r=await sb.auth.signUp({email:$("aE").value.trim(),password:$("aP").value});
+  if(r.error)return amsg(r.error.message);
+  if(r.data.session)return enter(r.data.user);
+  const u=r.data.user;
+  amsg(u&&u.identities&&!u.identities.length?"Ky email është i regjistruar. Shtyp “Hyr”.":"U regjistrove. Kontrollo emailin për ta konfirmuar llogarinë, pastaj shtyp “Hyr”.");
+}
+function leave(){
+  Object.keys(localStorage).filter(k=>k.startsWith("kalk_draft:")).forEach(k=>localStorage.removeItem(k));
+  me=null;cur="";$("app").hidden=true;$("auth").hidden=false;$("aP").value="";amsg("");
+}
+function enter(u){me=u;$("auth").hidden=true;$("app").hidden=false;$("who").textContent=u.email;return loadCompanies().catch(e=>say(e.message,true));}
+
+/* ---- Kompanitë dhe kolegët ---- */
+async function loadCompanies(keep){
+  comps=ok(await cloud().from("companies").select("id,name").order("name"))||[];
+  const last_=ls.get("kalk_current:"+me.id),has=id=>comps.some(c=>c.id===id);
+  await openCo(has(keep)?keep:has(last_)?last_:(comps[0]||{}).id||"");
+}
+async function openCo(id){
+  cur=id;if(id)ls.set("kalk_current:"+me.id,id);
+  const s=$("co");s.innerHTML=comps.length?"":"<option>– nuk ke asnjë kompani –</option>";
+  comps.forEach(c=>s.add(new Option(c.name,c.id)));s.value=id;
+  $("sumT").textContent="Përmbledhja e detajuar"+(id?" – "+curName():"");setTitle();
+  const d=id&&ls.get("kalk_draft:"+me.id+":"+id);setState(d&&d.rows&&d.rows.length?d:(id==="demo"?DEMO:blank()));
+  if(!sb){projs=[];mem=[];renderProjs();renderMem();return say("Mënyra demo: llogaritja funksionon, por ruajtja në cloud kërkon lidhjen me Supabase.");}
+  if(!id){projs=[];mem=[];renderProjs();renderMem();return say("Nuk ke asnjë kompani. Shto një, ose kërkoji kolegut të të shtojë me emailin tënd.");}
+  say("");await Promise.all([loadProjs(),loadMem()]);
+}
+$("co").onchange=busy($("co"),()=>$("co").value&&openCo($("co").value));
+$("coAdd").onclick=busy($("coAdd"),async()=>{
+  const n=(ask("Emri i kompanisë së re:")||"").trim();if(!n)return;
+  await loadCompanies(ok(await cloud().rpc("create_company",{p_name:n})));say("U shtua kompania “"+n+"”.");
+});
+$("coRen").onclick=busy($("coRen"),async()=>{
+  const n=(cur&&ask("Emri i ri i kompanisë:",curName())||"").trim();if(!n)return;
+  if(!ok(await cloud().from("companies").update({name:n}).eq("id",cur).select()).length)throw new Error("Vetëm pronari mund ta riemërtojë kompaninë.");
+  await loadCompanies(cur);
+});
+$("coDel").onclick=busy($("coDel"),async()=>{
+  if(!cur||!sure("Të fshihet kompania “"+curName()+"” me të gjitha llogaritjet e saj, për të gjithë kolegët? Kjo nuk kthehet pas."))return;
+  if(!ok(await cloud().from("companies").delete().eq("id",cur).select()).length)throw new Error("Vetëm pronari mund ta fshijë kompaninë.");
+  localStorage.removeItem("kalk_draft:"+me.id+":"+cur);await loadCompanies();say("Kompania u fshi.");
+});
+async function loadMem(){mem=ok(await cloud().from("members").select("user_id,email,role").eq("company_id",cur))||[];renderMem();}
+function renderMem(){
+  const box=$("mem");box.innerHTML="";
+  mem.forEach(m=>{
+    const c=document.createElement("span");c.className="chip";c.textContent=(m.email||"?")+(m.role==="owner"?" (pronar)":"");
+    if(isOwner()&&m.user_id!==me.id){
+      const x=document.createElement("button");x.type="button";x.textContent=" ×";x.setAttribute("aria-label","Hiq kolegun");
+      x.onclick=busy(x,async()=>{if(!sure("Të hiqet "+m.email+" nga kjo kompani?"))return;ok(await cloud().from("members").delete().eq("company_id",cur).eq("user_id",m.user_id));await loadMem();});
+      c.appendChild(x);
+    }
+    box.appendChild(c);
+  });
+  $("memAdd").hidden=!(cur&&isOwner());
+}
+$("mBtn").onclick=busy($("mBtn"),async()=>{
+  const em=$("mEmail").value.trim();if(!em||!cur)return;
+  ok(await cloud().rpc("add_member",{p_company:cur,p_email:em}));$("mEmail").value="";await loadMem();say("U shtua "+em+".");
+});
+
+/* ---- Llogaritjet e ruajtura (cloud) ---- */
+async function loadProjs(){projs=ok(await cloud().from("calcs").select("id,name,data").eq("company_id",cur).order("name"))||[];renderProjs();}
+function renderProjs(sel){
+  const s=$("pj");s.innerHTML="";s.add(new Option("– zgjidh një llogaritje –",""));
+  projs.forEach(p=>s.add(new Option(p.name,p.id)));s.value=sel||"";
+}
+const selProj=()=>projs.find(p=>p.id===$("pj").value);
+$("pj").onchange=()=>{const p=selProj();if(p){setState(p.data);say("U hap “"+p.name+"”.");}};
+$("pjSave").onclick=busy($("pjSave"),async()=>{
+  if(!cur)throw new Error("Zgjidh ose shto një kompani së pari.");
+  const n=(ask("Emri i llogaritjes (p.sh. Dërgesa nga Gjermania):",(selProj()||{}).name||"")||"").trim();if(!n)return;
+  if(projs.some(p=>p.name===n)&&!sure("Ekziston një llogaritje me këtë emër. Ta zëvendësoj?"))return;
+  ok(await cloud().from("calcs").upsert({company_id:cur,name:n,data:getState(),updated_by:me.id,updated_at:new Date().toISOString()},{onConflict:"company_id,name"}));
+  await loadProjs();renderProjs((projs.find(p=>p.name===n)||{}).id);say("U ruajt në cloud: “"+n+"”.");
+});
+$("pjDel").onclick=busy($("pjDel"),async()=>{
+  const p=selProj();if(!p||!sure("Të fshihet llogaritja “"+p.name+"” për të gjithë kolegët?"))return;
+  ok(await cloud().from("calcs").delete().eq("id",p.id));await loadProjs();say("U fshi “"+p.name+"”.");
+});
+$("pjNew").onclick=()=>{if(sure("Të fillohet një llogaritje e re? Ajo në ekran do të pastrohet (ato të ruajtura mbeten).")){setState(blank());renderProjs();say("Llogaritje e re.");}};
+$("bk").onclick=()=>download("kopje-"+slug()+".json",new Blob([JSON.stringify({v:3,company:curName(),calcs:projs.map(p=>({name:p.name,data:p.data}))},null,1)],{type:"application/json"}));
+$("flb").onclick=()=>$("fl").click();
+$("fl").onchange=busy($("flb"),async()=>{
+  const f=$("fl").files[0];$("fl").value="";if(!f||!cur)return;
+  let o;try{o=JSON.parse(await f.text());}catch(e){throw new Error("Skedari nuk është i vlefshëm.");}
+  const items=(o.calcs||[]).filter(c=>c&&c.name&&c.data);
+  if(!items.length)throw new Error("Skedari nuk ka llogaritje.");
+  if(!sure("Të importohen "+items.length+" llogaritje në “"+curName()+"”? Emrat ekzistues do të zëvendësohen."))return;
+  const now=new Date().toISOString();
+  ok(await cloud().from("calcs").upsert(items.map(i=>({company_id:cur,name:i.name,data:i.data,updated_by:me.id,updated_at:now})),{onConflict:"company_id,name"}));
+  await loadProjs();say("U importuan "+items.length+" llogaritje.");
+});
+
+/* ---- Nisja ---- */
+const C=window.APP_CONFIG||{};
+if(!window.supabase||!C.SUPABASE_URL||!C.SUPABASE_KEY||/PASTE/.test(C.SUPABASE_URL+C.SUPABASE_KEY)){
+  amsg("Programi nuk është lidhur ende me Supabase. Plotëso skedarin config.js.");$("aIn").disabled=$("aUp").disabled=true;$("aDemo").hidden=false;
+  $("aDemo").onclick=()=>{me={id:"demo",email:"demo"};comps=[{id:"demo",name:"Demo"}];$("auth").hidden=true;$("app").hidden=false;$("who").textContent="demo";openCo("demo");};
+}else{
+  sb=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_KEY);
+  $("aIn").onclick=busy($("aIn"),login);$("aUp").onclick=busy($("aUp"),signup);
+  $("aP").onkeydown=e=>{if(e.key==="Enter")$("aIn").click();};
+  sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT"&&me)leave();});
+  sb.auth.getSession().then(r=>{if(r.data&&r.data.session)enter(r.data.session.user);});
+}
+$("out").onclick=()=>sb?sb.auth.signOut():leave();
+setState(blank());applyLang();
+</script>
+</body>
+</html>
