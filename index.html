@@ -154,6 +154,7 @@ input.c{width:86px}input.d{min-width:200px}.lines select.u{width:92px}.lines td.
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
+<script>/* Nëse nuk përdor config.js, vendos çelësat këtu. */window.APP_CONFIG=window.APP_CONFIG||{SUPABASE_URL:"PASTE_SUPABASE_URL_HERE",SUPABASE_KEY:"PASTE_SUPABASE_KEY_HERE"};</script>
 <script>
 "use strict";
 /* ---- Gjuha: shqip (parazgjedhja) dhe anglisht ---- */
@@ -183,7 +184,7 @@ const EN={
 "Vlera furnizuese = sasia × çmimi − rabati. Transporti dhe shtesa doganore ndahen mes artikujve sipas vlerës furnizuese. Baza për doganë = vlera furnizuese + transporti + shtesa doganore.":"Supplier value = quantity × price − discount. Transport and customs additions are split between items by supplier value. Customs base = supplier value + transport + customs additions.",
 "Dogana = baza për doganë × norma (10% në përgjithësi; zakonisht 0% për mallra industriale me origjinë BE, CEFTA, Turqi ose EFTA, me dokument origjine). Vlera kushtuese = vlera furnizuese + transporti + dogana + akciza + shpenzimet pas doganës (shtesa doganore nuk hyn në kosto). TVSH = (baza për doganë + dogana + akciza) × tarifa.":"Customs duty = customs base × rate (10% in general; usually 0% for industrial goods of EU, CEFTA, Turkish or EFTA origin, with proof of origin). Cost value = supplier value + transport + duty + excise + post-customs expenses (customs additions are not part of the cost). VAT = (customs base + duty + excise) × VAT rate.",
 "Vlerësim informues: norma e saktë varet nga kodi HS dhe llogaritja përfundimtare bëhet nga Dogana e Kosovës.":"Indicative estimate: the exact rate depends on the HS code and the final calculation is made by Kosovo Customs.",
-"Përshkrimi i mallit":"Item name","copë":"pcs","Norma doganore %":"Duty rate %","Fshi mallin":"Delete item","Hiq kolegun":"Remove colleague","Kompania":"Company","Sasia ":"Quantity",
+"Përshkrimi i mallit":"Item name","copë":"pcs","Norma doganore %":"Duty rate %","Fshi mallin":"Delete item","Hiq kolegun":"Remove colleague","Kompania":"Company",
 "Tjetër (Kinë, SHBA, etj.)":"Other (China, USA, etc.)","BE (MSA/SAA)":"EU (SAA)","Turqia":"Turkey","– nuk ke asnjë kompani –":"– no company yet –","– zgjidh një llogaritje –":"– select a calculation –",
 "Ndodhi një gabim.":"Something went wrong.","Demo: ky veprim kërkon lidhjen me Supabase.":"Demo: this action needs the Supabase connection.",
 "Mënyra demo: llogaritja funksionon, por ruajtja në cloud kërkon lidhjen me Supabase.":"Demo mode: the calculation works, but cloud saving needs the Supabase connection.",
@@ -196,7 +197,7 @@ const EN={
 "Ekziston një llogaritje me këtë emër. Ta zëvendësoj?":"A calculation with this name exists. Replace it?","Të fillohet një llogaritje e re? Ajo në ekran do të pastrohet (ato të ruajtura mbeten).":"Start a new calculation? The one on screen will be cleared (saved ones remain).",
 "Llogaritje e re.":"New calculation.","Skedari nuk është i vlefshëm.":"The file is not valid.","Skedari nuk ka llogaritje.":"The file has no calculations.",
 "Vetëm pronari mund të shtojë kolegë":"Only the owner can add colleagues","Ky email nuk është regjistruar ende në program":"This email is not registered in the app yet","Duhet të hysh në llogari":"You must sign in",
-"Kalkulatori i importit – Kosovë":"Import calculator – Kosovo","Kursi (në EUR)":"Exchange rate (to EUR)","TVSH %":"VAT %","TOTALI":"TOTAL","Vlera e faturës":"Invoice value"
+"Kalkulatori i importit – Kosovë":"Import calculator – Kosovo","Kursi (në EUR)":"Exchange rate (to EUR)","TOTALI":"TOTAL"
 };
 const PAT=[
 [/^(\d+) furnitorë · (\d+) artikuj$/,"$1 suppliers · $2 items"],
@@ -239,7 +240,8 @@ const UNITS=["copë","kg","g","tonë","litër","ml","m","m²","m³","rol","pako"
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const FIELDS=["c","d","u","q","p","k","o","r","e","v"];
 const GLOBALS=["sup","nInv","dInv","dDoc","dud","dDud","ref","cur","kurs","note","tr","add","aft"];
-const blank=()=>({g:{sup:"",nInv:"",dInv:"",dDoc:new Date().toISOString().slice(0,10),dud:"",dDud:"",ref:"",cur:"EUR",kurs:1,note:"",tr:0,add:0,aft:0,vatpost:false},rows:[]});
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());};
+const blank=()=>({g:{sup:"",nInv:"",dInv:"",dDoc:today(),dud:"",dDud:"",ref:"",cur:"EUR",kurs:1,note:"",tr:0,add:0,aft:0,vatpost:false},rows:[]});
 const DEMO={g:{sup:"GRASS GMBH OESTERREICH",nInv:"4565074",dInv:"2026-07-01",dDoc:"2026-07-08",dud:"262011R24847",dDud:"2026-07-08",ref:"262011R24847",cur:"EUR",kurs:1,note:"",tr:120,add:15,aft:30,vatpost:false},
 rows:[{c:"000485",d:"TIOMOS COVER CAP",u:"copë",q:5000,p:0.05,k:0,o:"0",r:"",e:0,v:18},{c:"000486",d:"TIOMOS HINGE COVER",u:"copë",q:2000,p:0.14,k:5,o:"0",r:"",e:0,v:18},{c:"000489",d:"TIOMOS HINGE TS CLIP",u:"copë",q:1500,p:1.62,k:0,o:"1",r:"",e:0,v:18}]};
 
@@ -285,28 +287,43 @@ function setState(s){
   if(!tb.children.length)addRow({},true);
   calc();
 }
-function calc(){
-  const kurs=num($("kurs").value)||1,tr=num($("tr").value),add=num($("add").value),aft=num($("aft").value),vatpost=$("vatpost").checked;
-  const rows=[...tb.children].map(el=>{const v=k=>el.querySelector("."+k).value,q=num(v("q")),p=num(v("p")),dp=Math.min(num(v("k")),100);
-    const gross0=q*p*kurs,disc=gross0*dp/100;return{el,v,q,p,gross0,disc,net0:gross0-disc};});
-  const sum=rows.reduce((a,r)=>a+r.net0,0);
-  const T={gross0:0,ndisc:0,net0:0,ship:0,add:0,base:0,dut:0,exc:0,post:0,cost:0,vat:0,gross:0};last={rows:[],T};
-  rows.forEach((r,i)=>{
-    r.el.querySelector(".nr").textContent=i+1;
-    const sh=sum?r.net0/sum:0,ship=sh*tr,ad=sh*add,post=sh*aft,base=r.net0+ship+ad;
-    const o=ORIGINS[+r.v("o")]||ORIGINS[0];r.el.querySelector(".r").placeholder=o[1];
-    const rate=(r.v("r")!==""?num(r.v("r")):o[1])/100,dut=base*rate,exc=num(r.v("e")),vp=+r.v("v")||0;
-    const vat=(base+dut+exc+(vatpost?post:0))*vp/100,cost=r.net0+ship+dut+exc+post,gross=cost+vat,uc=r.q?cost/r.q:null;
-    const out={sv:r.net0,tr:ship,ad,bd:base,dut,vat,uc,cv:cost,gr:gross};
-    for(const k in out)r.el.querySelector(`[data-o=${k}]`).textContent=out[k]===null?"–":fmt(out[k],k==="uc"?4:2);
-    Object.entries({gross0:r.gross0,ndisc:-r.disc,net0:r.net0,ship,add:ad,base,dut,exc,post,cost,vat,gross}).forEach(([k,v])=>T[k]+=v);
-    last.rows.push([i+1,r.v("c"),r.v("d"),r.v("u"),r.q,r.p,Math.min(num(r.v("k")),100),o[0],rate*100,exc,"T"+vp,r.net0,ship,ad,base,dut,vat,uc||0,cost,gross]);
+const R=x=>Math.round((x+Number.EPSILON)*100)/100;
+/* ndan një shumë mes artikujve sipas peshës; shumat e rrumbullakosura i japin saktësisht totalin */
+function alloc(total,w){
+  const sum=w.reduce((a,b)=>a+b,0),t=R(total);if(!sum)return w.map(()=>0);
+  const out=w.map(x=>R(t*x/sum)),diff=R(t-out.reduce((a,b)=>a+b,0));
+  if(diff)out[w.indexOf(Math.max(...w))]=R(out[w.indexOf(Math.max(...w))]+diff);
+  return out;
+}
+/* g: kostot e dokumentit; L: artikujt. Çdo vlerë rrumbullakoset në 2 shifra, kështu totali = shuma e rreshtave. */
+function compute(g,L){
+  const gross0=L.map(l=>R(l.q*l.p*g.kurs)),disc=L.map((l,i)=>R(gross0[i]*l.k/100)),net0=gross0.map((x,i)=>R(x-disc[i]));
+  const ship=alloc(g.tr,net0),ad=alloc(g.add,net0),post=alloc(g.aft,net0);
+  const rows=L.map((l,i)=>{
+    const base=R(net0[i]+ship[i]+ad[i]),dut=R(base*l.rate/100),exc=R(l.e);
+    const vat=R((base+dut+exc+(g.vatpost?post[i]:0))*l.v/100),cost=R(net0[i]+ship[i]+dut+exc+post[i]);
+    return{gross0:gross0[i],ndisc:-disc[i],net0:net0[i],ship:ship[i],add:ad[i],base,dut,exc,post:post[i],cost,vat,gross:R(cost+vat),uc:l.q?cost/l.q:null};
   });
-  document.querySelectorAll("[data-k]").forEach(e=>e.textContent=fmt(T[e.dataset.k]));
-  document.querySelectorAll("[data-p]").forEach(e=>e.textContent=T.net0?fmt(T[e.dataset.p]/T.net0*100)+"%":"–");
+  const T={};["gross0","ndisc","net0","ship","add","base","dut","exc","post","cost","vat","gross"].forEach(k=>T[k]=R(rows.reduce((a,r)=>a+r[k],0)));
+  return{rows,T};
+}
+const COLS={sv:"net0",tr:"ship",ad:"add",bd:"base",dut:"dut",vat:"vat",uc:"uc",cv:"cost",gr:"gross"};
+function calc(){
+  const g={kurs:num($("kurs").value)||1,tr:num($("tr").value),add:num($("add").value),aft:num($("aft").value),vatpost:$("vatpost").checked};
+  const L=[...tb.children].map(el=>{
+    const v=k=>el.querySelector("."+k).value,o=ORIGINS[+v("o")]||ORIGINS[0];el.querySelector(".r").placeholder=o[1];
+    return{el,c:v("c"),d:v("d"),u:v("u"),q:num(v("q")),p:num(v("p")),k:Math.min(num(v("k")),100),o,rate:v("r")!==""?num(v("r")):o[1],e:num(v("e")),v:+v("v")||0};
+  });
+  last=compute(g,L);last.L=L;
+  L.forEach((l,i)=>{
+    l.el.querySelector(".nr").textContent=i+1;
+    for(const c in COLS){const x=last.rows[i][COLS[c]];l.el.querySelector(`[data-o=${c}]`).textContent=x===null?"–":fmt(x,c==="uc"?4:2);}
+  });
+  document.querySelectorAll("[data-k]").forEach(e=>e.textContent=fmt(last.T[e.dataset.k]));
+  document.querySelectorAll("[data-p]").forEach(e=>e.textContent=last.T.net0?fmt(last.T[e.dataset.p]/last.T.net0*100)+"%":"–");
   if(me&&cur)ls.set("kalk_draft:"+me.id+":"+cur,getState());
 }
-document.addEventListener("input",calc);document.addEventListener("change",e=>{if(e.target.id==="vatpost")calc();});
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#rows,.top"))calc();});
 $("add1").onclick=()=>{addRow({},true);calc();};
 
 /* ---- Eksporti në Excel ---- */
@@ -315,7 +332,7 @@ $("xl").onclick=()=>{
   const a=[["Kalkulatori i importit – Kosovë"],["Kompania",curName()],["Furnitori",v("sup")],["Nr. i faturës së furnitorit",v("nInv")],["Data e faturës",v("dInv")],["Data e dokumentit",v("dDoc")],["Referenca",v("ref")],["DUD (deklarata doganore)",v("dud")],["Data e DUD-it",v("dDud")],["Valuta",v("cur")],["Kursi (në EUR)",num(v("kurs"))||1],["Vërejtja",v("note")],[],
    ["Përmbledhja e detajuar","Shuma (EUR)"],["Vlera e faturës (para rabatit)",T.gross0],["Rabati",T.ndisc],["Vlera furnizuese (neto)",T.net0],["Transporti",T.ship],["Shtesa doganore",T.add],["Baza për doganë",T.base],["Dogana",T.dut],["Akciza",T.exc],["Shpenzimet pas doganës",T.post],["Vlera kushtuese (pa TVSH)",T.cost],["TVSH",T.vat],["Vlera me TVSH",T.gross],[]];
   const H=a.length;
-  a.push(["Nr.","Shifra","Emërtimi","Njësia","Sasia","Çmimi furnizues","Rabati %","Origjina","Dogana %","Akciza (EUR)","Tarifa","Vlera furnizuese","Transporti","Shtesa doganore","Baza për doganë","Dogana","TVSH","Çmimi kushtues","Vlera kushtuese","Vlera me TVSH"],...last.rows,
+  a.push(["Nr.","Shifra","Emërtimi","Njësia","Sasia","Çmimi furnizues","Rabati %","Origjina","Dogana %","Akciza (EUR)","Tarifa","Vlera furnizuese","Transporti","Shtesa doganore","Baza për doganë","Dogana","TVSH","Çmimi kushtues","Vlera kushtuese","Vlera me TVSH"],...last.L.map((l,i)=>{const r=last.rows[i];return[i+1,l.c,l.d,l.u,l.q,l.p,l.k,l.o[0],l.rate,l.e,"T"+l.v,r.net0,r.ship,r.add,r.base,r.dut,r.vat,r.uc||0,r.cost,r.gross];}),
    ["TOTALI","","","","","","","","","","",T.net0,T.ship,T.add,T.base,T.dut,T.vat,"",T.cost,T.gross]);
   a.forEach((r,i)=>a[i]=r.map(c=>typeof c==="string"?tr_(c):c));
   if(window.XLSX){
